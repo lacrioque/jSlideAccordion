@@ -1,0 +1,61 @@
+/**
+ * The Options Container can contain the following options
+ *      onlyOneOpen => true/false defines if multiple containers can be opened at the same time, default => true
+ *      slidetime => the jqSlidetime (default = 400)
+ *      groupclass => Name of the class that the onlyOneOpen Option checks against (default="sliderAdded")
+ *      subcontainer => the selector of the collapsible container (default='p')
+ *      startOpened => true/false if the first entry should be opened or not (default=false)
+ *      Example with defaults:
+ *      {'onlyOneOpen': true, 'slidetime': 400, 'groupclass': 'sliderAdded', 'subcontainer': 'p',  startOpened: false}
+ */
+
+(function($){
+$.fn.createSlide = function(option){
+    if(option == undefined){option = {};}
+    var jqItem = this,
+		def_slidetime = 400, def_onlyOneOpen = true, def_groupclass = 'SliderAdded', def_subcontainer = 'p', def_startOpened=false,
+		onlyOneOpen = option.onlyOneOpen !== undefined ? option.onlyOneOpen : def_onlyOneOpen,
+		slidetime = option.slidetime !== undefined ? option.slidetime : def_slidetime,
+		groupclass = option.groupclass !== undefined ? option.groupclass : def_groupclass,
+		subcontainer = option.subcontainer !== undefined ? option.subcontainer : def_subcontainer,
+		startOpened = option.startOpened !== undefined ? option.startOpened : def_startOpened,
+		run = function(item){
+			$(item).addClass(groupclass);
+			$(item).find(subcontainer).css({"display":"none"}).addClass("toggled");
+			$(item).find('.icon-toggle').addClass("toggled");
+			$(item).on("click", function(click){
+				var toggled = $(this).find(subcontainer).hasClass("toggled");
+				if(toggled === true){
+					if(onlyOneOpen) {
+						$("."+groupclass).each(function(i,subitem){
+							$(subitem).find(subcontainer).slideUp(slidetime).addClass("toggled");
+							$(subitem).find('.icon-toggle').addClass("toggled");
+						});
+					}
+					$(item).find(subcontainer).slideDown(slidetime);
+					$(item).find(subcontainer).removeClass("toggled");
+					$(item).find('.icon-toggle').removeClass("toggled");
+					console.log($(item).find('.icon-toggle'));
+				}else{
+					$(item).find(subcontainer).slideUp(slidetime, function(){
+						$(item).find(subcontainer).addClass("toggled");
+						$(item).find('.icon-toggle').addClass("toggled");
+					});
+
+				}
+			});
+		};
+	if(jqItem.length >1){
+		$(jqItem).each(function(i,item){run(item);});
+		if(startOpened){
+			$(jqItem[0]).trigger('click');
+		}
+	} else {
+		run(jqItem);
+		if(startOpened){
+			$(jqItem).trigger('click');
+		}
+	}
+	
+}
+})(jQuery);
